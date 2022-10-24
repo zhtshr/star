@@ -49,7 +49,9 @@ public:
     // unlock locked records
     for (auto i = 0u; i < writeSet.size(); i++) {
       auto &writeKey = writeSet[i];
-
+      // only unlock locked records
+      if (!writeKey.get_write_lock_bit())
+        continue;
       auto tableId = writeKey.get_table_id();
       auto partitionId = writeKey.get_partition_id();
       auto table = db.find_table(tableId, partitionId);
