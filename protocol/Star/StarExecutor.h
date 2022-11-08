@@ -206,6 +206,8 @@ public:
 
     uint64_t last_seed = 0;
 
+    // LOG(INFO) << "run transaction: " << "querynum " << query_num;
+
     for (auto i = 0u; i < query_num; i++) {
 
       bool retry_transaction = false;

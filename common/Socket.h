@@ -51,6 +51,7 @@ public:
 
   int connect(const char *addr, int port) {
     DCHECK(fd >= 0);
+    printf("%d connect to %s:%d\n", fd, addr, port);
     sockaddr_in serv = make_endpoint(addr, port);
     return ::connect(fd, (const sockaddr *)(&serv), sizeof(serv));
   }
@@ -188,6 +189,7 @@ class Listener {
 public:
   Listener(const char *addr, int port, int max_connections) {
     fd = socket(AF_INET, SOCK_STREAM, 0);
+    printf("%d listen %s:%d\n", fd, addr, port);
     CHECK(fd >= 0);
     bind(addr, port);
     listen(max_connections);

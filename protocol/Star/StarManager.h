@@ -41,6 +41,7 @@ public:
   void update_batch_size(uint64_t running_time) {
     // running_time in microseconds
     // context.group_time in ms
+    // printf("update: %d %lu %lu\n", batch_size, context.group_time, running_time);
     batch_size = batch_size * (context.group_time * 1000) / running_time;
 
     if (batch_size % 10 != 0) {

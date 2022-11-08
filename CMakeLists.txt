@@ -36,5 +36,16 @@ endif()
 add_executable(bench_tpcc bench_tpcc.cpp)
 target_link_libraries(bench_tpcc common)
 
-add_executable(bench_ycsb bench_ycsb.cpp)
-target_link_libraries(bench_ycsb common)
+# add_executable(bench_ycsb bench_ycsb.cpp)
+# target_link_libraries(bench_ycsb common)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+file(GLOB PY_FILES ${CMAKE_SOURCE_DIR}/scripts/*)
+  foreach(py_file ${PY_FILES})
+    add_custom_command(
+      TARGET bench_tpcc POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${py_file} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+      COMMENT "Copy file: ${py_file} -> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+    )
+  endforeach()

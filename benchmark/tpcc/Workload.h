@@ -34,6 +34,8 @@ public:
 
     int x = random.uniform_dist(1, 100);
     std::unique_ptr<TransactionType> p;
+    // LOG(INFO) << "next transaction: " << "coordinator_id " << coordinator_id
+    //           << " partition_id " << partition_id;
 
     if (context.workloadType == TPCCWorkloadType::MIXED) {
       if (x <= 50) {

@@ -4,18 +4,20 @@
 
 #pragma once
 
-#include "SpinLock.h"
+#include "common/SpinLock.h"
+#include "index.h"
 #include <atomic>
 #include <glog/logging.h>
 #include <unordered_map>
 
 namespace star {
 
-template <std::size_t N, class KeyType, class ValueType> class HashMap {
+template <std::size_t N, class KeyType, class ValueType>
+class HashMap : public Index<N,  KeyType, ValueType> {
 public:
   using hasher = typename std::unordered_map<KeyType, ValueType>::hasher;
 
-  bool remove(const KeyType &key) {
+  bool Delete(const KeyType &key) override {
     return _applyAt(
         [&key](std::unordered_map<KeyType, ValueType> &map) {
           auto it = map.find(key);
@@ -29,7 +31,7 @@ public:
         bucketNo(key));
   }
 
-  bool contains(const KeyType &key) {
+  bool Contains(const KeyType &key) override {
     return _applyAt(
         [&key](const std::unordered_map<KeyType, ValueType> &map) {
           return map.find(key) != map.end();
@@ -37,7 +39,7 @@ public:
         bucketNo(key));
   }
 
-  bool insert(const KeyType &key, const ValueType &value) {
+  bool Insert(const KeyType &key, const ValueType &value) override {
     return _applyAt(
         [&key, &value](std::unordered_map<KeyType, ValueType> &map) {
           if (map.find(key) != map.end()) {
@@ -49,7 +51,19 @@ public:
         bucketNo(key));
   }
 
-  ValueType &operator[](const KeyType &key) {
+  bool Update(const KeyType &key, const ValueType &value) override {
+    return _applyAt(
+        [&key, &value](std::unordered_map<KeyType, ValueType> &map) {
+          if (map.find(key) != map.end()) {
+            return false;
+          }
+          map[key] = value;
+          return true;
+        },
+        bucketNo(key));
+  }
+
+  ValueType &Search(const KeyType &key) override {
     return _applyAtRef(
         [&key](std::unordered_map<KeyType, ValueType> &map) -> ValueType & {
           return map[key];
@@ -67,6 +81,12 @@ public:
   void clear() {
     _map([](std::unordered_map<KeyType, ValueType> &map) { map.clear(); });
   }
+
+  Index<N, KeyType, ValueType>* newIndex() override {return nullptr;}
+
+  // Returns a iterator of index.
+  Iterator* NewIterator() override {return nullptr;}
+  void* NewIterator_Node() override { return nullptr; };
 
 private:
   template <class ApplyFunc>
@@ -105,7 +125,7 @@ private:
     return finalValue;
   }
 
-  auto bucketNo(const KeyType &key) { return hasher_(key) % N; }
+  auto bucketNo(const KeyType &key) const { return hasher_(key) % N; }
 
 private:
   hasher hasher_;

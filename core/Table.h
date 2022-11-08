@@ -7,7 +7,7 @@
 #include "benchmark/tpcc/Schema.h"
 #include "common/ClassOf.h"
 #include "common/Encoder.h"
-#include "common/HashMap.h"
+#include "common/index/HashMap.h"
 #include "common/StringPiece.h"
 
 namespace star {
@@ -55,26 +55,26 @@ public:
 
   std::tuple<MetaDataType *, void *> search(const void *key) override {
     const auto &k = *static_cast<const KeyType *>(key);
-    auto &v = map_[k];
+    auto &v = map_->Search(k);
     return std::make_tuple(&std::get<0>(v), &std::get<1>(v));
   }
 
   void *search_value(const void *key) override {
     const auto &k = *static_cast<const KeyType *>(key);
-    return &std::get<1>(map_[k]);
+    return &std::get<1>(map_->Search(k));
   }
 
   MetaDataType &search_metadata(const void *key) override {
     const auto &k = *static_cast<const KeyType *>(key);
-    return std::get<0>(map_[k]);
+    return std::get<0>(map_->Search(k));
   }
 
   void insert(const void *key, const void *value) override {
     const auto &k = *static_cast<const KeyType *>(key);
     const auto &v = *static_cast<const ValueType *>(value);
-    bool ok = map_.contains(k);
+    bool ok = map_->Contains(k);
     DCHECK(ok == false);
-    auto &row = map_[k];
+    auto &row = map_->Search(k);
     std::get<0>(row).store(0);
     std::get<1>(row) = v;
   }
@@ -82,7 +82,7 @@ public:
   void update(const void *key, const void *value) override {
     const auto &k = *static_cast<const KeyType *>(key);
     const auto &v = *static_cast<const ValueType *>(value);
-    auto &row = map_[k];
+    auto &row = map_->Search(k);
     std::get<1>(row) = v;
   }
 
@@ -90,7 +90,7 @@ public:
 
     std::size_t size = stringPiece.size();
     const auto &k = *static_cast<const KeyType *>(key);
-    auto &row = map_[k];
+    auto &row = map_->Search(k);
     auto &v = std::get<1>(row);
 
     Decoder dec(stringPiece);
@@ -119,7 +119,7 @@ public:
   std::size_t partitionID() override { return partitionID_; }
 
 private:
-  HashMap<N, KeyType, std::tuple<MetaDataType, ValueType>> map_;
+  HashMap<N, KeyType, std::tuple<MetaDataType, ValueType>> *map_;
   std::size_t tableID_;
   std::size_t partitionID_;
 };

@@ -28,6 +28,8 @@ template <> class StarQueryNum<star::tpcc::Context> {
 public:
   static std::size_t get_s_phase_query_num(const star::tpcc::Context &context,
                                            uint32_t batch_size) {
+    // LOG(INFO) << "s phase: " << "batch size " << batch_size
+    //           << " context.newOrderCrossPartitionProbability " << context.newOrderCrossPartitionProbability;
     if (context.workloadType == star::tpcc::TPCCWorkloadType::NEW_ORDER_ONLY) {
       return batch_size * (100 - context.newOrderCrossPartitionProbability) /
              100;
@@ -46,6 +48,8 @@ public:
 
   static std::size_t get_c_phase_query_num(const star::tpcc::Context &context,
                                            uint32_t batch_size) {
+    // LOG(INFO) << "c phase: " << "coordinator num " << context.coordinator_num << " batch size " << batch_size
+    //           << " context.newOrderCrossPartitionProbability " << context.newOrderCrossPartitionProbability;
     if (context.workloadType == star::tpcc::TPCCWorkloadType::NEW_ORDER_ONLY) {
       return context.coordinator_num * batch_size *
              context.newOrderCrossPartitionProbability / 100;

@@ -16,6 +16,11 @@ int main(int argc, char *argv[]) {
   google::InstallFailureSignalHandler();
   google::ParseCommandLineFlags(&argc, &argv, true);
 
+  google::SetLogDestination(google::GLOG_INFO, "/home/zht/star/log/INFO_");
+	google::SetLogDestination(google::GLOG_WARNING, "/home/zht/star/log/WARNING_");
+	google::SetLogDestination(google::GLOG_ERROR, "/home/zht/star/log/ERROR_");
+	google::SetLogDestination(google::GLOG_FATAL, "/home/zht/star/log/FATAL_");
+
   star::tpcc::Context context;
   SETUP_CONTEXT(context);
 
