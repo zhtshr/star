@@ -51,7 +51,9 @@ public:
   virtual ~Table() override = default;
 
   Table(std::size_t tableID, std::size_t partitionID)
-      : tableID_(tableID), partitionID_(partitionID) {}
+      : tableID_(tableID), partitionID_(partitionID) {
+        map_ = new HashMap<N, KeyType, std::tuple<MetaDataType, ValueType>>();
+      }
 
   std::tuple<MetaDataType *, void *> search(const void *key) override {
     const auto &k = *static_cast<const KeyType *>(key);

@@ -17,6 +17,9 @@ class HashMap : public Index<N,  KeyType, ValueType> {
 public:
   using hasher = typename std::unordered_map<KeyType, ValueType>::hasher;
 
+  HashMap<N, KeyType, ValueType>() {}
+  ~HashMap<N, KeyType, ValueType>() {}
+
   bool Delete(const KeyType &key) override {
     return _applyAt(
         [&key](std::unordered_map<KeyType, ValueType> &map) {
@@ -45,7 +48,10 @@ public:
           if (map.find(key) != map.end()) {
             return false;
           }
-          map[key] = value;
+          auto &row = map[key];
+          std::get<0>(row).store(0);
+          std::get<1>(row) = std::get<1>(value);
+          // map[key] = value;
           return true;
         },
         bucketNo(key));
@@ -57,7 +63,7 @@ public:
           if (map.find(key) != map.end()) {
             return false;
           }
-          map[key] = value;
+          // map[key] = value;
           return true;
         },
         bucketNo(key));
