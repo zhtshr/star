@@ -1,4 +1,4 @@
-WORK_DIR=/home/zht/star/
+WORK_DIR=`pwd`/
 
 cd ${WORK_DIR}
 rm -rf build
