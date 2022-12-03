@@ -1,6 +1,7 @@
 #include "benchmark/ycsb/Database.h"
 #include "core/Coordinator.h"
 #include "core/Macros.h"
+#include <unistd.h>
 
 DEFINE_int32(read_write_ratio, 80, "read write ratio");
 DEFINE_int32(read_only_ratio, 0, "read only transaction ratio");
@@ -20,10 +21,21 @@ int main(int argc, char *argv[]) {
   google::InstallFailureSignalHandler();
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  google::SetLogDestination(google::GLOG_INFO, "/home/zht/star/log/INFO_");
-	google::SetLogDestination(google::GLOG_WARNING, "/home/zht/star/log/WARNING_");
-	google::SetLogDestination(google::GLOG_ERROR, "/home/zht/star/log/ERROR_");
-	google::SetLogDestination(google::GLOG_FATAL, "/home/zht/star/log/FATAL_");
+  std::string log_path;
+  char *buffer;
+  if ((buffer = getcwd(NULL, 0)) == NULL) {
+    printf("getcwd error!\n");
+    return 0;
+  }
+  log_path = buffer;
+  free(buffer);
+  log_path += "/log/";
+  printf("%s\n", log_path.c_str());
+
+  google::SetLogDestination(google::GLOG_INFO, (log_path + "INFO_").c_str());
+	google::SetLogDestination(google::GLOG_WARNING, (log_path + "WARNING_").c_str());
+	google::SetLogDestination(google::GLOG_ERROR, (log_path + "ERROR_").c_str());
+	google::SetLogDestination(google::GLOG_FATAL, (log_path + "FATAL_").c_str());
 
   star::ycsb::Context context;
   SETUP_CONTEXT(context);

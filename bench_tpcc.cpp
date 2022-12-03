@@ -1,6 +1,7 @@
 #include "benchmark/tpcc/Database.h"
 #include "core/Coordinator.h"
 #include "core/Macros.h"
+#include <unistd.h>
 
 DEFINE_bool(operation_replication, false, "use operation replication");
 DEFINE_string(query, "neworder", "tpcc query, mixed, neworder, payment");
@@ -16,10 +17,22 @@ int main(int argc, char *argv[]) {
   google::InstallFailureSignalHandler();
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  google::SetLogDestination(google::GLOG_INFO, "/home/zht/star/log/INFO_");
-	google::SetLogDestination(google::GLOG_WARNING, "/home/zht/star/log/WARNING_");
-	google::SetLogDestination(google::GLOG_ERROR, "/home/zht/star/log/ERROR_");
-	google::SetLogDestination(google::GLOG_FATAL, "/home/zht/star/log/FATAL_");
+  std::string log_path;
+  char *buffer;
+  if ((buffer = getcwd(NULL, 0)) == NULL) {
+    printf("getcwd error!\n");
+    return 0;
+  }
+  log_path = buffer;
+  free(buffer);
+  log_path += "/log/";
+  printf("%s\n", log_path.c_str());
+
+  google::SetLogDestination(google::GLOG_INFO, (log_path + "INFO_").c_str());
+	google::SetLogDestination(google::GLOG_WARNING, (log_path + "WARNING_").c_str());
+	google::SetLogDestination(google::GLOG_ERROR, (log_path + "ERROR_").c_str());
+	google::SetLogDestination(google::GLOG_FATAL, (log_path + "FATAL_").c_str());
+
 
   star::tpcc::Context context;
   SETUP_CONTEXT(context);
